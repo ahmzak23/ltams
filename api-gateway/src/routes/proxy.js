@@ -11,13 +11,30 @@ const proxyRequest = async (req, res, next) => {
     const startTime = Date.now();
 
     try {
+        // Transform the request body based on content type
+        let requestData = req.body;
+        let contentType = req.headers['content-type'];
+        
+        if (contentType === 'application/x-www-form-urlencoded') {
+            // For form data, send as URLSearchParams
+            requestData = new URLSearchParams(req.body).toString();
+        }
+
+        logger.info('Proxying request', {
+            path: req.path,
+            method: req.method,
+            contentType,
+            requestData: contentType === 'application/x-www-form-urlencoded' ? requestData : '[REDACTED]'
+        });
+
         const response = await axios({
             method: req.method,
             url: `${BACKEND_URL}${req.path}`,
-            data: req.body,
+            data: requestData,
             headers: {
                 ...req.headers,
-                host: new URL(BACKEND_URL).host
+                host: new URL(BACKEND_URL).host,
+                'content-type': contentType
             },
             params: req.query
         });
@@ -41,7 +58,8 @@ const proxyRequest = async (req, res, next) => {
                 statusCode: error.response.status,
                 error: error.message,
                 duration,
-                requestId
+                requestId,
+                requestData: contentType === 'application/x-www-form-urlencoded' ? requestData : '[REDACTED]'
             });
 
             res.status(error.response.status).json(error.response.data);

@@ -1,13 +1,12 @@
 @echo off
-echo Creating database if it doesn't exist...
-set PGPASSWORD=postgres
-psql -h localhost -U postgres -c "CREATE DATABASE ticketdb;" || echo Database already exists
-
-echo Initializing database...
-python backend/init_db.py
-
 echo Starting the application...
 docker-compose up -d
+
+echo Waiting for the database to be ready...
+timeout /t 10
+
+echo Initializing the database...
+docker-compose run --rm db-init
 
 echo Application started successfully!
 echo Frontend is available at: http://localhost:3000

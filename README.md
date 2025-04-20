@@ -1,137 +1,137 @@
-# Observability Demo Application
+# LTMAS (Logging, Tracking, Alerting & Monitoring Systems)
 
-This project demonstrates modern observability practices using a microservices-based ticket booking system. It showcases the integration of logging, metrics, and distributed tracing with practical examples of alerts, dashboards, and observability configurations.
+A comprehensive system for logging, tracking, alerting, and monitoring applications and services.
+
+## Overview
+
+LTMAS provides a centralized platform for:
+- Logging and log aggregation
+- Request tracking and tracing
+- Alerting and notification
+- System and application monitoring
+- Performance metrics collection and visualization
 
 ## Architecture
 
-The application consists of the following components:
+The system consists of the following components:
 
-### Application Services
-- Frontend (React)
-- API Gateway (Node.js/Express)
-- Backend Service (Python/FastAPI)
-- Background Worker (Python)
-- PostgreSQL Database
+- **Frontend**: React-based web interface
+- **API Gateway**: Entry point for all API requests
+- **Backend**: Core business logic and data processing
+- **Worker**: Background task processing
+- **Database**: PostgreSQL for data storage
+- **Monitoring**: Prometheus for metrics collection and Grafana for visualization
+- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana) for log management
+- **Tracing**: Jaeger for distributed tracing
+- **Alerting**: Alertmanager for alert routing and notification
 
-### Observability Stack
-- OpenTelemetry Collector - Telemetry pipeline
-- Prometheus - Metrics collection and storage
-- Loki - Log aggregation
-- Tempo - Distributed tracing backend
-- Grafana - Visualization and dashboards
-- AlertManager - Alert management and routing
-
-## Quick Start
+## Getting Started
 
 ### Prerequisites
-- Docker and Docker Compose
-- Make (optional, for using Makefile commands)
 
-### Setup and Running
+- Docker and Docker Compose
+- Node.js (for local development)
+- Python 3.9+ (for local development)
+
+### Installation
 
 1. Clone the repository:
-```bash
-git clone <repository-url>
-cd observability-demo
-```
+   ```
+   git clone https://github.com/yourusername/ltmas.git
+   cd ltmas
+   ```
 
-2. Start the application:
-```bash
-docker-compose up -d
-```
+2. Start the services:
+   ```
+   docker-compose up -d
+   ```
 
-3. Access the services:
-- Frontend: http://localhost:3000
-- Grafana: http://localhost:3001 (admin/admin)
-- Prometheus: http://localhost:9090
-- AlertManager: http://localhost:9093
+3. Access the application:
+   - Frontend: http://localhost:3000
+   - API Gateway: http://localhost:8000
+   - Grafana: http://localhost:3001
+   - Kibana: http://localhost:5601
+   - Jaeger: http://localhost:16686
 
-## Project Structure
+## Monitoring Dashboards
 
-```
-.
-├── frontend/                 # React frontend application
-├── api-gateway/             # Node.js API Gateway
-├── backend/                 # Python/FastAPI backend service
-├── worker/                  # Background worker service
-├── observability/          # Observability configurations
-│   ├── prometheus/        # Prometheus config and rules
-│   ├── grafana/          # Grafana dashboards and provisioning
-│   ├── loki/            # Loki configuration
-│   ├── tempo/           # Tempo configuration
-│   ├── otel-collector/  # OpenTelemetry Collector config
-│   └── alertmanager/    # AlertManager configuration
-└── docker-compose.yml    # Docker Compose configuration
-```
+LTMAS provides several pre-configured Grafana dashboards for monitoring different aspects of the system:
 
-## Observability Features
+### Database Team Dashboard
+- **URL**: http://localhost:3001/d/ltmas-database/ltmas-database-team
+- **Description**: Monitors database performance, connections, transactions, and cache hit ratio
+- **Key Metrics**: Active connections, transaction counts, database size, cache hit ratio
 
-### Logging
-- Structured JSON logging across all services
-- Log correlation with trace IDs
-- Centralized logging with Loki
-- Log rotation and retention policies
+### System Team Dashboard
+- **URL**: http://localhost:3001/d/ltmas-system/ltmas-system-team
+- **Description**: Tracks system resources including CPU, memory, and disk usage
+- **Key Metrics**: CPU utilization, memory usage, disk space, network I/O
 
-### Metrics
-- RED metrics (Rate, Error, Duration) for all endpoints
-- USE metrics (Utilization, Saturation, Errors) for infrastructure
-- Business metrics (bookings, users, conversion rates)
-- Custom application metrics
+### API Team Dashboard
+- **URL**: http://localhost:3001/d/ltmas-api/ltmas-api-team
+- **Description**: Monitors API performance and usage patterns
+- **Key Metrics**: Request counts, response times, error rates, endpoint usage
 
-### Distributed Tracing
-- Full request tracing across services
-- Span attributes for business context
-- Database query tracing
-- External API call tracing
+### Business Team Dashboard
+- **URL**: http://localhost:3001/d/ltmas-business/ltmas-business-team
+- **Description**: Tracks business metrics and KPIs
+- **Key Metrics**: Ticket counts by status and priority, resolution times, user activity
 
-### Dashboards
-- Service-specific dashboards
-- Cross-service dashboards
-- Business metrics dashboards
-- SLO dashboards
-- Infrastructure dashboards
+## Configuration
 
-### Alerting
-- Service health alerts
-- Performance degradation alerts
-- Error rate alerts
-- Business metric anomaly alerts
+Configuration files are located in the `config` directory:
+- `config/prometheus.yml`: Prometheus configuration
+- `config/grafana/provisioning`: Grafana datasources and dashboards
+- `config/alertmanager.yml`: Alertmanager configuration
+- `config/logstash/pipeline`: Logstash pipeline configuration
 
 ## Development
 
-### Adding New Services
+### Local Development
 
-1. Create a new service directory
-2. Add service to docker-compose.yml
-3. Implement OpenTelemetry instrumentation
-4. Add service-specific dashboards
-5. Configure appropriate alerts
+1. Install dependencies:
+   ```
+   # Frontend
+   cd frontend
+   npm install
 
-### Modifying Observability Configuration
+   # Backend
+   cd backend
+   pip install -r requirements.txt
+   ```
 
-1. Update relevant configuration in observability/ directory
-2. Restart affected services:
-```bash
-docker-compose restart <service-name>
+2. Start development servers:
+   ```
+   # Frontend
+   cd frontend
+   npm run dev
+
+   # Backend
+   cd backend
+   uvicorn app.main:app --reload
+   ```
+
+### Testing
+
 ```
+# Frontend
+cd frontend
+npm test
 
-## Production Considerations
-
-- Secure credentials and sensitive configurations
-- Implement proper retention policies for logs and metrics
-- Configure appropriate sampling rates for traces
-- Set up backup and disaster recovery
-- Monitor storage usage for metrics and logs
-- Implement proper access controls and authentication
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+# Backend
+cd backend
+pytest
+```
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [Prometheus](https://prometheus.io/)
+- [Grafana](https://grafana.com/)
+- [ELK Stack](https://www.elastic.co/elastic-stack)
+- [Jaeger](https://www.jaegertracing.io/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [React](https://reactjs.org/) 

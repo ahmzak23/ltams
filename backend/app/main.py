@@ -8,6 +8,8 @@ from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from prometheus_client import make_asgi_app
+from .core.monitoring_service import MonitoringService
+from .core.metrics import get_all_metrics
 
 from app.core.config import settings
 from app.db.session import engine
@@ -45,6 +47,21 @@ app.add_middleware(
 # Add Prometheus metrics endpoint
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
+
+# Initialize monitoring service
+monitoring_service = None
+
+@app.on_event("startup")
+async def startup_event():
+    global monitoring_service
+    from .db.session import async_session
+    monitoring_service = MonitoringService(async_session)
+    await monitoring_service.start()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    if monitoring_service:
+        await monitoring_service.stop()
 
 # Include API router
 app.include_router(api_router, prefix="/api/v1")
