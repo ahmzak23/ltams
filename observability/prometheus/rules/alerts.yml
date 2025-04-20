@@ -1,0 +1,87 @@
+groups:
+  - name: service_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (service)
+          /
+          sum(rate(http_requests_total[5m])) by (service)
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected for {{ $labels.service }}
+          description: "Error rate is above 5% for the last 5 minutes"
+
+      - alert: SlowResponseTime
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))
+          > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Slow response time for {{ $labels.service }}
+          description: "95th percentile of response time is above 2 seconds"
+
+      - alert: HighCPUUsage
+        expr: |
+          process_cpu_seconds_total{service!=""} > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High CPU usage for {{ $labels.service }}
+          description: "CPU usage is above 80% for 5 minutes"
+
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes{service!=""} / 1024 / 1024 > 1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High memory usage for {{ $labels.service }}
+          description: "Memory usage is above 1GB"
+
+  - name: business_alerts
+    rules:
+      - alert: LowBookingRate
+        expr: |
+          rate(booking_requests_total[1h]) < 10
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: Low booking rate detected
+          description: "Booking rate is below 10 per hour"
+
+      - alert: HighPaymentFailureRate
+        expr: |
+          sum(rate(payment_failures_total[15m])) 
+          / 
+          sum(rate(payment_attempts_total[15m])) 
+          > 0.1
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: High payment failure rate
+          description: "Payment failure rate is above 10% for 15 minutes"
+
+  - name: slo_alerts
+    rules:
+      - alert: SLOErrorBudgetBurn
+        expr: |
+          (
+            sum(rate(http_requests_total{status!~"5.."}[1h]))
+            /
+            sum(rate(http_requests_total[1h]))
+          ) < 0.995
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: SLO Error budget burning too fast
+          description: "Service availability is below 99.5% in the last hour" 
